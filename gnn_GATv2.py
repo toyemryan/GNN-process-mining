@@ -1,18 +1,3 @@
-"""
-GATv2 versione 3: come gnn_GATv2Conv_v2.py, ma il numero di teste di attenzione
-e il modo di combinarle vengono scelti da Optuna (iperparametri 'num_heads' e 'concat').
-
-  concat=False: ogni testa produce un vettore di dimensione layers_size, poi si fa la MEDIA delle teste
-                (più parametri: circa num_heads volte quelli di una testa sola)
-  concat=True : ogni testa produce un vettore di dimensione layers_size // num_heads, poi le teste
-                vengono MESSE IN FILA (stessa dimensione finale, stesso numero di parametri di una testa sola)
-
-In entrambi i casi l'uscita di ogni layer ha dimensione layers_size: il resto del modello non cambia.
-num_heads deve dividere layers_size (64, 96, ..., 256): con num_heads in [1, 2, 4] è sempre vero.
-
-Invariato rispetto alla versione 2: [CORREZIONE] nessun aggr='mean', [MODIFICA 2] ultimo nodo
-aggiunto al riassunto, [MODIFICA 4] LayerNorm + connessione residua.
-"""
 import torch
 from torch.nn import Module, ModuleList, LayerNorm
 from torch.nn.functional import relu, dropout
@@ -55,7 +40,7 @@ class GATv2_GNN(Module):
             for size_in in sizes_in
         ])
 
-        # [MODIFICA 4] una normalizzazione per ogni layer
+        # una normalizzazione per ogni layer
         self.norms = ModuleList([LayerNorm(self.layers_size) for _ in range(len(self.convs))])
 
         # [MODIFICA 2] lin1 riceve il riassunto del grafo + il vettore dell'ultimo nodo (2 x layers_size)

@@ -1,11 +1,6 @@
 """
 Mostra gli iperparametri scelti da Optuna per il modello migliore di ogni dataset e di ogni esperimento.
 
-Uso (nella cartella `code`):
-    python migliori_iperparametri.py
-
-Gli iperparametri vengono letti dal file del modello salvato (model_it_<trial>.pt),
-che contiene il dizionario `parameters` usato per costruirlo.
 """
 from os.path import exists
 import pandas as pd

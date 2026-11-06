@@ -1,14 +1,4 @@
-"""
-Versione modificata di gnn.py (il file originale del professore non viene toccato).
 
-Modifiche rispetto a gnn.py:
-  [MODIFICA 2] Il vettore dell'ULTIMO nodo del prefisso (l'attività più recente) viene
-               aggiunto al riassunto del grafo prima della classificazione.
-  [MODIFICA 4] Una normalizzazione (LayerNorm) dopo ogni layer SAGEConv e una
-               connessione residua a partire dal 2° layer.
-
-Il resto (layer, readout, dropout, layer lineari finali) è identico a gnn.py.
-"""
 import torch
 from torch.nn import Module, ModuleList, LayerNorm
 from torch.nn.functional import relu, dropout
@@ -43,10 +33,9 @@ class SAGE_GNN(Module):
             self.convs.append(SAGEConv(in_channels=self.layers_size, out_channels=self.layers_size, aggr=self.aggregator))
         self.convs.append(SAGEConv(in_channels=self.layers_size, out_channels=self.layers_size, aggr=self.aggregator))
 
-        # [MODIFICA 4] una normalizzazione per ogni layer SAGEConv
         self.norms = ModuleList([LayerNorm(self.layers_size) for _ in range(len(self.convs))])
 
-        # [MODIFICA 2] lin1 riceve il riassunto del grafo + il vettore dell'ultimo nodo (2 x layers_size)
+        # lin1 riceve il riassunto del grafo + il vettore dell'ultimo nodo (2 x layers_size)
         self.lin1 = Linear(2 * self.layers_size, self.layers_size)
         self.lin2 = Linear(self.layers_size, self.output_size)
 
@@ -57,14 +46,14 @@ class SAGE_GNN(Module):
 
         for i, (conv, norm) in enumerate(zip(self.convs, self.norms)):
             h = conv(x, edge_index)
-            h = norm(h)                                                   # [MODIFICA 4] normalizzazione
+            h = norm(h)                                                   # normalizzazione
             h = relu(h)
             h = dropout(h, p=self.dropout, training=self.training)
-            x = h if i == 0 else x + h                                    # [MODIFICA 4] residuo (dimensioni uguali dal 2° layer)
+            x = h if i == 0 else x + h                                    # residuo (dimensioni uguali dal 2° layer)
 
         graph = self.readout(x, batch)                                    # riassunto del grafo (come prima)
 
-        # [MODIFICA 2] indice dell'ultimo nodo di OGNI grafo del batch = l'indice più alto di quel grafo.
+        # indice dell'ultimo nodo di OGNI grafo del batch = l'indice più alto di quel grafo.
         # I nodi sono ordinati cronologicamente da data_encoding.py,
         # quindi è l'ultima attività del prefisso. Il target (attività successiva) non è mai in x.
         node_idx = torch.arange(x.size(0), device=x.device)

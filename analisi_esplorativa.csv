@@ -1,0 +1,6 @@
+dataset,tracce,eventi,attivita,varianti,lung_min,lung_max,lung_media,lung_mediana,nodi_paralleli_%,tracce_train,tracce_val,tracce_test,org_resource,prefissi,pref_train,pref_val,pref_test,classi,classe_piu_frequente_%,classe_meno_frequente
+Receipt,1434,8577,27,116,1,25,6.0,6.0,0.0,768,192,474,True,7143,3780,957,2406,26,19.8,1
+Helpdesk_no_resources,3804,13710,9,154,1,14,3.6,3.0,0.0,2038,510,1256,False,9906,5299,1330,3277,8,42.7,4
+BPI20R,6886,36796,19,89,1,20,5.3,5.0,0.1,3690,923,2273,True,29910,15977,4005,9928,19,21.2,1
+BPI20P,2099,18246,29,202,1,21,8.7,8.0,0.0,1124,282,693,True,16147,8655,2162,5330,29,12.7,7
+BPI12WC,9658,72413,6,2263,1,74,7.5,6.0,0.0,5176,1294,3188,True,62755,33776,8690,20289,6,36.6,203

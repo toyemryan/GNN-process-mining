@@ -1,17 +1,4 @@
-"""
-GGNN versione 3: come gnn_GatedGraph_v2.py, ma due scelte specifiche di GGNN
-vengono lasciate a Optuna (iperparametri 'ggnn_aggr' e 'ggnn_input').
 
-  ggnn_aggr  : come si combinano i messaggi dei predecessori ad ogni passo
-               'add'  = somma (GGNN originale), 'mean' = media, 'max' = massimo
-  ggnn_input : come le schede in ingresso (es. 32 valori) arrivano a layers_size valori
-               'pad'    = completate con zeri (GGNN originale)
-               'linear' = trasformate da un layer lineare appreso prima della propagazione
-
-Invariato rispetto alla versione 2: (hidden_layers + 2) passi di propagazione con GRU,
-[MODIFICA 2] ultimo nodo aggiunto al riassunto, [MODIFICA 4] LayerNorm, readout, dropout,
-i due layer lineari finali. Il parametro 'aggregator' non viene usato da questo modello.
-"""
 import torch
 from torch.nn import Module, LayerNorm
 from torch.nn.functional import relu, dropout
@@ -48,14 +35,14 @@ class GGNN_GNN(Module):
             if self.input_size > self.layers_size:
                 raise ValueError('Con ggnn_input="pad" serve layers_size >= numero di valori in ingresso')
 
-        # GGNN: num_steps passi di propagazione, ognuno seguito dall'aggiornamento GRU
+        # num_steps passi di propagazione, ognuno seguito dall'aggiornamento GRU
         self.ggnn = GatedGraphConv(out_channels=self.layers_size, num_layers=self.num_steps,
                                    aggr=self.ggnn_aggr)
 
-        # [MODIFICA 4] normalizzazione dopo la propagazione
+        # normalizzazione dopo la propagazione
         self.norm = LayerNorm(self.layers_size)
 
-        # [MODIFICA 2] lin1 riceve il riassunto del grafo + il vettore dell'ultimo nodo (2 x layers_size)
+        # lin1 riceve il riassunto del grafo + il vettore dell'ultimo nodo (2 x layers_size)
         self.lin1 = Linear(2 * self.layers_size, self.layers_size)
         self.lin2 = Linear(self.layers_size, self.output_size)
 
@@ -68,12 +55,12 @@ class GGNN_GNN(Module):
             x = self.input_proj(x)                                        # ingresso 'linear'
 
         x = self.ggnn(x, edge_index)                                      # propagazione + GRU
-        x = self.norm(x)                                                  # [MODIFICA 4]
+        x = self.norm(x)                                                  
         x = dropout(x, p=self.dropout, training=self.training)
 
         graph = self.readout(x, batch)                                    # riassunto del grafo
 
-        # [MODIFICA 2] ultimo nodo di ogni grafo del batch (indice più alto = attività più recente)
+        # ultimo nodo di ogni grafo del batch (indice più alto = attività più recente)
         node_idx = torch.arange(x.size(0), device=x.device)
         last_idx = scatter(node_idx, batch, dim=0, reduce='max')
         last = x[last_idx]

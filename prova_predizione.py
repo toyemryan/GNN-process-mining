@@ -1,11 +1,6 @@
 """
 Prova del modello addestrato su un prefisso: quale sarà la prossima attività?
 
-Uso (nella cartella `code`, con il .venv attivo):
-    python prova_predizione.py
-
-Per provare un altro prefisso, un altro dataset o un altro modello,
-modificare i parametri qui sotto.
 """
 import json
 import torch
@@ -14,22 +9,21 @@ from gnn_SAGE import SAGE_GNN    # per GATv2: from gnn_GATv2 import GATv2_GNN as
 #from gnn_GatedGraph_v3 import GGNN_GNN as SAGE_GNN
 
 
-# ----- Parametri da modificare -----
+# Parametri da modificare
 DATASET = 'Helpdesk_no_resources'
 PREFISSO = 's3789_3'       # <traccia>_<lunghezza del prefisso> (vedi i file in dataset/<DATASET>_tensors)
 MODELLI = 'models_sage'      # cartella dei risultati dell'addestramento
 
-# ----- 1. Il prefisso da provare -----
+#  Il prefisso da provare
 # Nome del file: <dataset>_<traccia>_<lunghezza del prefisso>.pt
 prefisso = torch.load(f'dataset/{DATASET}_tensors/{DATASET}_{PREFISSO}.pt', weights_only=False)
 
-# ----- 2. I nomi delle attività -----
+# I nomi delle attività
 # Il file JSON associa a ogni nome il suo vettore one-hot.
-# Si costruisce il dizionario inverso: posizione dell'1 -> nome dell'attività.
 ohe = json.load(open(f'dataset/{DATASET}_ohe_activity.json'))
 nomi = {vettore.index(1): nome for nome, vettore in ohe.items()}
 
-# ----- 3. Il modello addestrato -----
+# Il modello addestrato
 # Il trial migliore è nella prima riga del file riassuntivo.
 trial = int(pd.read_csv(f'{MODELLI}/{DATASET}_metrics.csv').iloc[0]['trial'])
 salvataggio = torch.load(f'{MODELLI}/{DATASET}/model_it_{trial}.pt', weights_only=False, map_location='cpu')
@@ -38,12 +32,12 @@ modello = SAGE_GNN(data=prefisso, parameters=salvataggio['parameters'])   # mode
 modello.load_state_dict(salvataggio['state_dict'])                        # si caricano i pesi appresi
 modello.eval()                                                            # modalità predizione (dropout disattivato)
 
-# ----- 4. La predizione -----
+#  La predizione 
 with torch.no_grad():                                  # nessun apprendimento qui
     punteggi = modello(prefisso)                       # un punteggio per ogni attività possibile
 probabilita = torch.softmax(punteggi, dim=-1)[0]       # punteggi -> probabilità (somma = 100 %)
 
-# ----- 5. Il risultato -----
+#  Il risultato 
 attivita = [nomi[i] for i in prefisso.x[:, :len(nomi)].argmax(dim=1).tolist()]
 print('Prefisso             :', ' -> '.join(attivita))
 print('Attività reale       :', prefisso.next_activity, f'(insieme: {prefisso.set})')

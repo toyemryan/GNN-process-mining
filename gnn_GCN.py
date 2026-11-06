@@ -1,14 +1,4 @@
-"""
-GCN con lo stesso scheletro v2 degli altri modelli, per un confronto equo.
 
-Differenze rispetto a gnn_GCNConv.py (versione del collega):
-  [MODIFICA 2] Il vettore dell'ULTIMO nodo del prefisso viene aggiunto al riassunto del grafo.
-  [MODIFICA 4] LayerNorm dopo ogni layer GCNConv e connessione residua dal 2° layer.
-  [MODIFICA 5] `improved` funziona davvero: in PyG 2.8 viene ignorato se non si passa
-               `edge_weight`, quindi passiamo un peso 1 per ogni arco.
-
-Optuna sceglie `improved` (True/False): vedi get_hyperparameters in hyper_parameters_search.py.
-"""
 import torch
 from torch.nn import Module, ModuleList, LayerNorm
 from torch.nn.functional import relu, dropout
@@ -67,7 +57,7 @@ class GCN_GNN(Module):
 
         graph = self.readout(x, batch)
 
-        # [MODIFICA 2] ultimo nodo di ogni grafo del batch (indice più alto = attività più recente)
+        # ultimo nodo di ogni grafo del batch (indice più alto = attività più recente)
         node_idx = torch.arange(x.size(0), device=x.device)
         last_idx = scatter(node_idx, batch, dim=0, reduce='max')
         x = torch.cat([graph, x[last_idx]], dim=-1)

@@ -6,8 +6,6 @@ Quattro reti neurali su grafi (**GraphSAGE**, **GATv2**, **GGNN** e **GCN**) imp
 
 Questo repository riprende un codice esistente, sviluppato su macOS/Linux, lo **adatta a Windows** con una GPU NVIDIA e ne **modifica lo scheletro** (sezione 3).
 
-<!-- Da completare: riferimento all'articolo / al codice originale -->
-
 ---
 
 ## 1. Far funzionare il progetto su Windows
