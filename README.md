@@ -1,4 +1,11 @@
-![Python](https://shields.io) ![Terminé](https://shields.io) ![Git](https://shields.io) ![](https://komarev.com)
+![Python](https://shields.io)
+
+![Terminé](https://shields.io)
+
+![Git](https://shields.io)
+
+![](https://komarev.com)
+
 # Predizione della prossima attività con le Graph Neural Networks
 
 > Progetto — *Big Data Analytics & Machine Learning*
