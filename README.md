@@ -1,11 +1,7 @@
-![Python](https://shields.io)
-
-![Terminé](https://shields.io)
-
-![Git](https://shields.io)
-
-![](https://komarev.com)
-
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-2.8-EE4C2C?logo=pytorch&logoColor=white) ![PyTorch Geometric](https://img.shields.io/badge/PyTorch%20Geometric-GNN-3C2179)
+![Optuna](https://img.shields.io/badge/Optuna-iperparametri-2F4F9F) ![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white)
+![Stato](https://img.shields.io/badge/stato-completato-brightgreen)
+![Visite](https://komarev.com/ghpvc/?username=toyemryan&label=Visite&color=blue&style=flat)
 # Predizione della prossima attività con le Graph Neural Networks
 
 > Progetto — *Big Data Analytics & Machine Learning*
